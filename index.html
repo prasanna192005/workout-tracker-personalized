@@ -4,28 +4,508 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Workout Tracker</title>
+    <title>Workout Tracker - Home</title>
+
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             margin: 0;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background: #0f0f0f;
             color: #ffffff;
+            min-height: 100vh;
+        }
+
+        header {
+            padding: 1.5rem 1rem;
+            text-align: center;
+            background: #1a1a1a;
+            border-bottom: 1px solid #2a2a2a;
+        }
+
+        header h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+            color: #ffffff;
+        }
+
+        header small {
+            font-size: 0.9rem;
+            color: #888888;
+            font-weight: 400;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+
+        .week-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 8px;
+        }
+
+        .week-nav h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .nav-btn {
+            padding: 0.5rem 1rem;
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            border-radius: 6px;
+            color: #ffffff;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .nav-btn:hover {
+            background: #3a3a3a;
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .stats {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            flex: 1;
+            padding: 1rem;
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: #888888;
+            font-weight: 500;
+        }
+
+        .days-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        .day-card {
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 8px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .day-card:hover {
+            background: #1f1f1f;
+            border-color: #3a3a3a;
+            transform: translateY(-2px);
+        }
+
+        .day-card.completed {
+            border-color: #4ade80;
+            background: #1a1a1a;
+        }
+
+        .day-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 0.5rem;
+        }
+
+        .day-name {
+            font-size: 0.9rem;
+            color: #888888;
+            margin-bottom: 1rem;
+        }
+
+        .completion-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            color: #888888;
+        }
+
+        .checkmark {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #3a3a3a;
+            border-radius: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 100vh;
+            font-size: 14px;
+        }
+
+        .day-card.completed .checkmark {
+            background: #4ade80;
+            border-color: #4ade80;
+            color: #0f0f0f;
+        }
+
+        .day-card.completed .completion-status {
+            color: #4ade80;
+        }
+
+        .mark-btn {
+            margin-top: 1rem;
+            padding: 0.5rem 1rem;
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            border-radius: 6px;
+            color: #ffffff;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            width: 100%;
+            transition: all 0.2s ease;
+        }
+
+        .mark-btn:hover {
+            background: #3a3a3a;
+        }
+
+        .day-card.completed .mark-btn {
+            background: #1f3a2a;
+            border-color: #4ade80;
+            color: #4ade80;
+        }
+
+        /* Loading State */
+        .loading {
             text-align: center;
+            padding: 3rem;
+            color: #888888;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0f0f0f;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #2a2a2a;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3a3a3a;
+        }
+
+        @media (max-width: 640px) {
+            header {
+                padding: 1rem;
+            }
+
+            header h2 {
+                font-size: 1.25rem;
+            }
+
+            header small {
+                font-size: 0.8rem;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            .week-nav {
+                padding: 0.75rem;
+                margin-bottom: 1rem;
+            }
+
+            .week-nav h3 {
+                font-size: 1.1rem;
+            }
+
+            .nav-btn {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.85rem;
+            }
+
+            .stats {
+                gap: 0.75rem;
+                margin-bottom: 1rem;
+            }
+
+            .stat-card {
+                padding: 0.75rem;
+            }
+
+            .stat-value {
+                font-size: 1.5rem;
+            }
+
+            .stat-label {
+                font-size: 0.75rem;
+            }
+
+            .days-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.75rem;
+            }
+
+            .day-card {
+                padding: 1rem;
+            }
+
+            .day-number {
+                font-size: 1.25rem;
+            }
+
+            .day-name {
+                font-size: 0.8rem;
+                margin-bottom: 0.75rem;
+            }
+
+            .completion-status {
+                font-size: 0.75rem;
+            }
+
+            .checkmark {
+                width: 18px;
+                height: 18px;
+                font-size: 12px;
+            }
+
+            .mark-btn {
+                padding: 0.5rem;
+                font-size: 0.8rem;
+            }
         }
     </style>
 </head>
 
 <body>
+
+    <header>
+        <h2>Workout Tracker</h2>
+        <small>Track your fitness journey</small>
+    </header>
+
+    <div class="container">
+        <div class="week-nav">
+            <h3 id="weekTitle">Week 1</h3>
+            <div class="nav-buttons">
+                <button class="nav-btn" id="prevWeek">← Previous</button>
+                <button class="nav-btn" id="nextWeek">Next →</button>
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-value" id="weekProgress">0/6</div>
+                <div class="stat-label">This Week</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalCompleted">0</div>
+                <div class="stat-label">Total Completed</div>
+            </div>
+        </div>
+
+        <div class="days-grid" id="daysGrid">
+            <div class="loading">Loading...</div>
+        </div>
+    </div>
+
     <script>
-        // Redirect to home.html
-        window.location.href = 'home.html';
+        const API_URL = 'https://workouttrack19.vercel.app/api';
+        let currentWeek = 1;
+        let progressData = [];
+
+        const dayNames = {
+            1: 'Chest + Triceps',
+            2: 'Back + Biceps',
+            3: 'Abs',
+            4: 'Shoulders + Legs',
+            5: 'Full Body + Abs',
+            6: 'Core'
+        };
+
+        // Initialize
+        async function init() {
+            await loadProgress();
+            renderDays();
+            updateStats();
+        }
+
+        // Load progress from API
+        async function loadProgress() {
+            try {
+                const response = await fetch(`${API_URL}/progress`);
+                progressData = await response.json();
+            } catch (error) {
+                console.error('Error loading progress:', error);
+                progressData = [];
+            }
+        }
+
+        // Check if a day is completed
+        function isDayCompleted(dayNumber) {
+            return progressData.some(p =>
+                p.weekNumber === currentWeek &&
+                p.dayNumber === dayNumber &&
+                p.completed
+            );
+        }
+
+        // Get progress ID for a day
+        function getProgressId(dayNumber) {
+            const progress = progressData.find(p =>
+                p.weekNumber === currentWeek &&
+                p.dayNumber === dayNumber
+            );
+            return progress ? progress._id : null;
+        }
+
+        // Render days grid
+        function renderDays() {
+            const grid = document.getElementById('daysGrid');
+            grid.innerHTML = '';
+
+            for (let day = 1; day <= 6; day++) {
+                const completed = isDayCompleted(day);
+                const card = document.createElement('div');
+                card.className = `day-card ${completed ? 'completed' : ''}`;
+
+                card.innerHTML = `
+      <div class="day-number">Day ${day}</div>
+      <div class="day-name">${dayNames[day]}</div>
+      <div class="completion-status">
+        <div class="checkmark">${completed ? '✓' : ''}</div>
+        <span>${completed ? 'Completed' : 'Not started'}</span>
+      </div>
+      <button class="mark-btn" onclick="toggleCompletion(${day}, event)">
+        ${completed ? 'Unmark' : 'Mark Complete'}
+      </button>
+    `;
+
+                // Click to view workout (except on button)
+                card.addEventListener('click', (e) => {
+                    if (!e.target.classList.contains('mark-btn')) {
+                        window.location.href = `workout.html?day=${day}`;
+                    }
+                });
+
+                grid.appendChild(card);
+            }
+
+            document.getElementById('weekTitle').textContent = `Week ${currentWeek}`;
+            document.getElementById('prevWeek').disabled = currentWeek === 1;
+        }
+
+        // Toggle completion status
+        async function toggleCompletion(dayNumber, event) {
+            event.stopPropagation();
+
+            const progressId = getProgressId(dayNumber);
+
+            try {
+                if (progressId) {
+                    // Unmark - delete progress
+                    await fetch(`${API_URL}/progress/${progressId}`, {
+                        method: 'DELETE'
+                    });
+                } else {
+                    // Mark complete - create progress
+                    await fetch(`${API_URL}/progress`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            date: new Date().toISOString(),
+                            dayNumber,
+                            weekNumber: currentWeek
+                        })
+                    });
+                }
+
+                // Reload and update
+                await loadProgress();
+                renderDays();
+                updateStats();
+            } catch (error) {
+                console.error('Error toggling completion:', error);
+                alert('Failed to update progress. Make sure the server is running.');
+            }
+        }
+
+        // Update statistics
+        function updateStats() {
+            const weekCompleted = progressData.filter(p =>
+                p.weekNumber === currentWeek && p.completed
+            ).length;
+
+            const totalCompleted = progressData.filter(p => p.completed).length;
+
+            document.getElementById('weekProgress').textContent = `${weekCompleted}/6`;
+            document.getElementById('totalCompleted').textContent = totalCompleted;
+        }
+
+        // Week navigation
+        document.getElementById('prevWeek').addEventListener('click', () => {
+            if (currentWeek > 1) {
+                currentWeek--;
+                renderDays();
+                updateStats();
+            }
+        });
+
+        document.getElementById('nextWeek').addEventListener('click', () => {
+            currentWeek++;
+            renderDays();
+            updateStats();
+        });
+
+        // Initialize on load
+        init();
     </script>
-    <p>Redirecting to home...</p>
+
 </body>
 
 </html>
